@@ -4,6 +4,7 @@ import { sync } from './sync.js';
 import { enablePush, disablePush, refreshPushSilently } from './push.js';
 import { startReminderLoop, requestPermission, onInAppToast } from './notify.js';
 import { today, esc, addDays, formatDate, weekdayName } from './utils.js';
+import { addPhotos, removePhoto, hydratePhotos, deleteAllCloudPhotos, MAX_PER_DAY } from './photos.js';
 import { TABS, viewDay, viewEdit, rowHTML, viewTimeline, viewCalendar, viewSettings, viewFixed, WEEK_ORDER, daysText, viewNotes } from './views.js';
 
 const $main = document.getElementById('main');
@@ -37,6 +38,7 @@ function render() {
   window.scrollTo(0, y);
   document.body.dataset.page = page;
   $main.querySelectorAll('.rv-text').forEach(autoGrow);
+  hydratePhotos($main);
   const active = page === 'edit' || page === 'settings' ? '' : page === 'fixed' ? 'day' : page;
   $nav.innerHTML = TABS.map((t) => `<a href="#/${t.key}" class="${active === t.key ? 'on' : ''}">${t.icon}<span>${t.label}</span></a>`).join('');
 }
@@ -292,6 +294,21 @@ const actions = {
     if (rvExpanded.has(k)) rvExpanded.delete(k); else rvExpanded.add(k);
     autoGrow(el.parentElement.querySelector('.rv-text'));
   },
+  // 复盘照片：点缩略图看大图，点 × 删除
+  'rv-photo-view': (el) => {
+    const src = el.querySelector('img')?.src;
+    if (!src) return;
+    const box = document.createElement('div');
+    box.className = 'lightbox';
+    box.innerHTML = `<img src="${src}" alt="复盘照片" />`;
+    box.addEventListener('click', () => box.remove());
+    document.body.appendChild(box);
+  },
+  'rv-photo-del': async (el) => {
+    if (!confirm('删除这张照片吗？')) return;
+    await removePhoto(el.dataset.date, el.dataset.id);
+    toast('照片已删除');
+  },
   'rv-mood': (el) => {
     const cur = el.classList.contains('on');
     saveReview(el.dataset.date, { mood: cur ? '' : el.dataset.v });
@@ -393,12 +410,17 @@ const actions = {
   'change-pw': () => openNewPassword('修改密码'),
   'delete-account': () => {
     openSheet('注销账户', `
-      <p class="danger">注销后，这个账号和它在云端的<b>所有任务、固定任务、小记、复盘</b>都会被永久删除，所有设备上都无法恢复。</p>
+      <p class="danger">注销后，这个账号和它在云端的<b>所有任务、固定任务、小记、复盘和照片</b>都会被永久删除，所有设备上都无法恢复。</p>
       <p class="muted small">建议先在「数据 → 导出备份」保存一份。确认注销请在下面输入「注销」两个字。</p>
       <label>确认<input name="confirm" placeholder="注销" autocomplete="off" /></label>`,
     (fd) => {
       if (fd.get('confirm').trim() !== '注销') return '请输入「注销」两个字确认';
-      disablePush().catch(() => {}); sync.deleteAccount().then(() => { toast('账户已注销，所有数据已删除'); render(); }).catch((e) => toast('注销失败：' + e.message));
+      disablePush().catch(() => {});
+      // 先删云端照片（存储桶里的文件不会随账号自动删除），再删账号和数据
+      deleteAllCloudPhotos()
+        .then(() => sync.deleteAccount())
+        .then(() => { toast('账户已注销，所有数据已删除'); render(); })
+        .catch((e) => toast('注销失败：' + e.message));
     }, '永久注销');
   },
   'ask-notify': async () => { const r = await requestPermission(); toast(r === 'granted' ? '通知已开启' : '未开启通知'); render(); },
@@ -472,6 +494,18 @@ document.addEventListener('change', async (e) => {
   const el = e.target.closest('[data-act-change]');
   if (!el) return;
   if (el.dataset.actChange === 'pick-day' && el.value) go('day/' + el.value);
+  if (el.dataset.actChange === 'rv-photo') {
+    const files = [...el.files];
+    el.value = '';
+    if (!files.length) return;
+    toast('正在处理照片…');
+    try {
+      const { added, skipped } = await addPhotos(el.dataset.date, files);
+      toast(skipped ? `已添加 ${added} 张，每天最多 ${MAX_PER_DAY} 张` : `已添加 ${added} 张照片 📷`);
+    } catch (err) {
+      toast(err.message);
+    }
+  }
   if (el.dataset.actChange === 'import') {
     const f = el.files[0];
     if (!f) return;

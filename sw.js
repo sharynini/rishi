@@ -1,8 +1,8 @@
 // Service Worker：缓存 App 文件，离线也能打开
-const VERSION = 'daily-v0.8.1';
+const VERSION = 'daily-v0.9.0';
 const ASSETS = [
   './', 'index.html', 'styles.css', 'manifest.webmanifest',
-  'js/app.js', 'js/views.js', 'js/store.js', 'js/sync.js', 'js/notify.js', 'js/utils.js', 'js/config.js', 'js/push.js',
+  'js/app.js', 'js/views.js', 'js/store.js', 'js/sync.js', 'js/notify.js', 'js/utils.js', 'js/config.js', 'js/push.js', 'js/photos.js',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png',
 ];
 

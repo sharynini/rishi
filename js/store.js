@@ -306,7 +306,7 @@ export function noteToTask(id, date) {
   store.put('dtask', { date, time: '', endTime: '', title: title.slice(0, 80), done: false, order: 999, fromNote: id });
 }
 
-// ---- 每日复盘 review：id = review|日期，{ date, mood, feel, mistakes, thoughts } ----
+// ---- 每日复盘 review：id = review|日期，{ date, mood, feel, mistakes, thoughts, photos: [{ id, ext }] } ----
 export const MOODS = [
   { k: 'great', e: '🥰', t: '超开心' },
   { k: 'good', e: '😊', t: '不错' },
@@ -320,8 +320,11 @@ export function saveReview(date, patch) {
   const prev = getReview(date) || {};
   const next = { ...prev, ...patch };
   delete next.id;
-  const empty = !next.mood && !(next.feel || '').trim() && !(next.mistakes || '').trim() && !(next.thoughts || '').trim();
+  const empty = !next.mood && !(next.feel || '').trim() && !(next.mistakes || '').trim() && !(next.thoughts || '').trim()
+    && !(next.photos || []).length;
   if (empty) { if (getReview(date)) store.remove(reviewId(date)); return; }
   store.put('review', { date, ...patch }, reviewId(date));
 }
+// 复盘里有照片的日子（日历小卡显示 📷）
+export const reviewPhotoDates = () => new Set(store.all('review').filter((r) => (r.photos || []).length).map((r) => r.date));
 export const reviewMoods = () => new Map(store.all('review').filter((r) => r.mood).map((r) => [r.date, MOODS.find((m) => m.k === r.mood)?.e || '']));

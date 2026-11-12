@@ -1,5 +1,5 @@
 // 页面：今天（某一天）/ 编辑一天 / 时间轴 / 日历 / 设置
-import { tasksOn, fixedOn, deadlines, REMIND_DAYS, isRestDay, hasFixedOn, fixedTemplates, tplPausedOn, calendarData, taskDateRange, notes, IDEA_STATUS, MOODS, getReview, reviewMoods } from './store.js';
+import { tasksOn, fixedOn, deadlines, REMIND_DAYS, isRestDay, hasFixedOn, fixedTemplates, tplPausedOn, calendarData, taskDateRange, notes, IDEA_STATUS, MOODS, getReview, reviewMoods, reviewPhotoDates } from './store.js';
 import { sync, BUILTIN } from './sync.js';
 import { pushSupported, pushOn } from './push.js';
 import { permission, MORNING, NIGHT } from './notify.js';
@@ -95,7 +95,8 @@ function reviewCard(date, done, total) {
   const isToday = date === today();
   const title = `🌙 ${isToday ? '今日' : '这天的'}复盘`;
   const mood = MOODS.find((m) => m.k === r.mood);
-  const written = !!(mood || r.feel || r.mistakes || r.thoughts);
+  const photos = r.photos || [];
+  const written = !!(mood || r.feel || r.mistakes || r.thoughts || photos.length);
   const field = (key, icon, label, ph) => `
     <label class="rv-field">
       <span class="rv-label">${icon} ${label}</span>
@@ -112,6 +113,16 @@ function reviewCard(date, done, total) {
     <div class="rv-moods" role="radiogroup" aria-label="今天的心情">
       ${MOODS.map((m) => `<button class="rv-mood ${r.mood === m.k ? 'on' : ''}" data-act="rv-mood" data-date="${date}" data-v="${m.k}" role="radio" aria-checked="${r.mood === m.k}" title="${m.t}">${m.e}</button>`).join('')}
       <span class="rv-mood-text">${mood ? mood.t : '今天心情如何？'}</span>
+    </div>
+    <div class="rv-photos">
+      ${photos.map((p) => `<div class="rv-photo" data-photo="${esc(p.id)}" data-ext="${esc(p.ext)}" data-act="rv-photo-view" role="button" aria-label="查看照片">
+        <img alt="复盘照片" />
+        <button type="button" class="rv-photo-del" data-act="rv-photo-del" data-date="${date}" data-id="${esc(p.id)}" aria-label="删除这张照片">×</button>
+      </div>`).join('')}
+      ${photos.length < 3 ? `<label class="rv-photo-add">
+        <span>📷</span><em>${photos.length ? '再加一张' : '添加照片'}</em>
+        <input type="file" accept="image/*" multiple hidden data-act-change="rv-photo" data-date="${date}" />
+      </label>` : ''}
     </div>
     ${field('feel', '💗', '今天的感受', '有什么开心或难忘的小事～')}
     ${field('mistakes', '🩹', '小错误 / 踩过的坑', '写下来就是进步')}
@@ -244,7 +255,7 @@ export function viewTimeline() {
 /* ---------- 日历（按年月倒序：越新越靠上） ---------- */
 const MONTH_STICKERS = ['⛄', '🧧', '🌸', '🌷', '🌼', '🍓', '🍉', '🌻', '🍁', '🎃', '🍂', '🎄'];
 
-function calCell(ds, t, list, mood = '') {
+function calCell(ds, t, list, mood = '', hasPhoto = false) {
   const d = parseDate(ds).getDate();
   const isFuture = ds > t;
   // 还没到、也没安排任务的日子：不显示
@@ -261,7 +272,7 @@ function calCell(ds, t, list, mood = '') {
     : `<span class="cal-empty">${ds === t ? '今日暂无' : '无任务'}</span>`;
   const cls = [ds === t ? 'today' : '', isFuture ? 'future' : '', !items.length ? 'none' : done.length === items.length ? 'all-done' : ''].join(' ');
   return `<button class="cal-cell ${cls}" data-act="go" data-to="day/${ds}" aria-label="${formatDate(ds)}，完成 ${done.length}/${list.length}">
-    <span class="cal-num">${d}<span class="cal-badges">${mood ? `<i class="cal-mood">${mood}</i>` : ''}${done.length && done.length === items.length ? '<b class="star">★</b>' : ''}</span></span>${body}
+    <span class="cal-num">${d}<span class="cal-badges">${mood ? `<i class="cal-mood">${mood}</i>` : ''}${hasPhoto ? '<i class="cal-photo" aria-label="有照片">📷</i>' : ''}${done.length && done.length === items.length ? '<b class="star">★</b>' : ''}</span></span>${body}
   </button>`;
 }
 
@@ -283,6 +294,7 @@ export function viewCalendar() {
     if (firstM < bottom) bottom = firstM < min ? min : firstM;
   }
   const moods = reviewMoods();
+  const photoDays = reviewPhotoDates();
   const map = calendarData(toDateStr(bottom), toDateStr(new Date(top.getFullYear(), top.getMonth() + 1, 0)));
   const dates = [...map.keys()];
 
@@ -306,7 +318,7 @@ export function viewCalendar() {
       const ds = toDateStr(new Date(y, mo, d));
       const list = map.get(ds) || [];
       monthDone += list.filter((x) => x.done).length;
-      cells += calCell(ds, t, list, moods.get(ds));
+      cells += calCell(ds, t, list, moods.get(ds), photoDays.has(ds));
     }
     html += `<section class="cal-month" ${isCur ? 'id="cur-month"' : ''}>
       <h2 class="cal-title"><span class="tape">${MONTH_STICKERS[mo]} ${mo + 1}月</span><span class="count">完成 ${monthDone} 项</span></h2>

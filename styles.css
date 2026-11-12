@@ -425,3 +425,37 @@ body[data-page="calendar"] .main { max-width: 900px; }
 @media (min-width: 600px) { .cal-mood { font-size: 14px; } }
 .forgot { align-self: flex-start; margin-top: -4px; }
 .delete-acc { align-self: center; margin-top: 2px; }
+
+/* ---------- 复盘照片 ---------- */
+.rv-photos { display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0 4px; }
+.rv-photo, .rv-photo-add { position: relative; width: 84px; height: 84px; border-radius: 12px; flex: none; }
+.rv-photo {
+  overflow: hidden; background: var(--card-2); border: 3px solid var(--card); box-shadow: var(--shadow);
+  transform: rotate(-1.5deg); cursor: zoom-in;
+}
+.rv-photo:nth-child(2n) { transform: rotate(1.5deg); }
+.rv-photo img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0; transition: opacity .2s; }
+.rv-photo.loaded img { opacity: 1; }
+.rv-photo.missing::after {
+  content: "未同步"; position: absolute; inset: 0; display: grid; place-items: center; font: 12px var(--hand); color: var(--muted);
+}
+.rv-photo.pending::before {
+  content: "☁︎ 待上传"; position: absolute; left: 3px; bottom: 3px; z-index: 1; font-size: 10px; line-height: 16px;
+  padding: 0 5px; border-radius: 8px; background: rgba(0, 0, 0, .45); color: #fff;
+}
+.rv-photo-del {
+  position: absolute; top: 3px; right: 3px; z-index: 1; width: 22px; height: 22px; padding: 0; border: none; border-radius: 50%;
+  background: rgba(0, 0, 0, .45); color: #fff; font-size: 15px; line-height: 22px; cursor: pointer;
+}
+.rv-photo-add {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer;
+  border: 2px dashed color-mix(in srgb, var(--pink) 45%, var(--line)); background: var(--card); color: var(--ink-2);
+}
+.rv-photo-add span { font-size: 22px; line-height: 1; }
+.rv-photo-add em { font: 12px var(--hand); font-style: normal; }
+.cal-photo { font-style: normal; font-size: 10px; }
+.lightbox {
+  position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 16px;
+  background: rgba(20, 14, 10, .88); cursor: zoom-out;
+}
+.lightbox img { max-width: 100%; max-height: 100%; border-radius: 12px; box-shadow: 0 10px 40px rgba(0, 0, 0, .4); }
