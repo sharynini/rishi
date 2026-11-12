@@ -1,0 +1,5 @@
+# Netlify 响应头配置
+# 只允许运行本站自己的脚本（更安全），同时会让免费版的 "Powered by Netlify" 角标不再显示
+/*
+  Content-Security-Policy: script-src 'self'; object-src 'none'; base-uri 'self'
+  X-Content-Type-Options: nosniff
