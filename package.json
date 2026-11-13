@@ -1,0 +1,9 @@
+{
+  "name": "rishi",
+  "private": true,
+  "description": "日拾：离线优先的每日任务与复盘 PWA（零依赖，本文件只用于运行测试）",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.js"
+  }
+}
