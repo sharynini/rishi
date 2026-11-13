@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>日拾 · 使用手册</title>
+<style>
+  @page { size: A4; margin: 17mm 16mm 20mm; }
+  @page :first { margin: 0; }
+  :root {
+    --ink: #4b3a2f; --ink2: #6f5f53; --muted: #9a8b7e; --pink: #d6698a; --pink-soft: #f6d6dd;
+    --line: #e8dccb; --card: #fffcf6; --head: #f6ecdc; --green: #4c9f7c; --green-bg: #eef6f1; --red: #d26a6a; --red-bg: #fcf0ef;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { margin: 0; color: var(--ink2); font: 9.6pt/1.85 'Noto Sans CJK SC', sans-serif; letter-spacing: .02em; }
+  .serif { font-family: 'Noto Serif CJK SC', serif; }
+  b, strong { color: var(--ink); font-weight: 600; }
+  p { margin: 0 0 6px; }
+
+  /* ---------- 封面 ---------- */
+  .cover {
+    position: relative; width: 210mm; height: 297mm; overflow: hidden; break-after: page;
+    background: #fdf6ea radial-gradient(#ead9c4 0.6px, transparent 0.7px) 0 0 / 7mm 7mm;
+    text-align: center; color: var(--ink2);
+  }
+  .tape { position: absolute; left: 50%; top: -2mm; width: 64mm; height: 20mm; transform: translateX(-50%) rotate(1deg); background: #fde3a0; opacity: .95; }
+  .cover .kicker { padding-top: 34mm; font-size: 8.5pt; letter-spacing: .45em; color: var(--muted); }
+  .cover h1 { margin: 10mm 0 0; font: 900 50pt/1 'Noto Serif CJK SC', serif; color: #4a3424; letter-spacing: .3em; padding-left: .3em; position: relative; display: inline-block; }
+  .cover h1::after { content: ""; position: absolute; left: 2mm; right: 0; bottom: 1mm; height: 9mm; background: var(--pink-soft); z-index: -1; border-radius: 3mm; }
+  .cover .sub { margin-top: 9mm; display: flex; align-items: center; justify-content: center; gap: 7mm; font: 15pt 'Noto Serif CJK SC', serif; color: var(--pink); letter-spacing: .5em; }
+  .cover .sub::before, .cover .sub::after { content: ""; width: 21mm; border-top: 1px solid #dcc9b6; }
+  .cover .lead { margin-top: 8mm; font-size: 10pt; line-height: 2.1; }
+  .cover .marks { margin-top: 8mm; font-size: 14pt; color: var(--pink); letter-spacing: .6em; }
+  .cover .who { margin: 40mm auto 0; width: 146mm; text-align: left; background: #fffdf8; border: 1px solid #ecdfcd; border-radius: 4mm; padding: 4mm 5mm 9mm; font-size: 9pt; line-height: 1.9; }
+  .cover .who h4 { margin: 0; font: 600 10pt 'Noto Serif CJK SC', serif; color: var(--ink); }
+  .cover .motto { position: absolute; left: 0; right: 0; bottom: 42mm; font: 600 11pt 'Noto Serif CJK SC', serif; color: var(--pink); }
+  .cover .motto::before { content: ""; display: block; width: 66mm; margin: 0 auto 12mm; border-top: 1px dashed #dcc9b6; }
+  .cover .foot { position: absolute; left: 18mm; right: 18mm; bottom: 15mm; display: flex; justify-content: space-between; font-size: 8pt; color: var(--muted); border-top: 1px dotted #e4d6c4; padding-top: 3mm; }
+  .cover .new { display: inline-block; margin-left: 2mm; padding: 0 2mm; border-radius: 2mm; background: var(--pink); color: #fff; font-size: 7pt; letter-spacing: .05em; }
+
+  /* ---------- 章节 ---------- */
+  .chap { display: flex; align-items: center; gap: 3.5mm; margin: 9mm 0 4mm; padding-bottom: 3mm; border-bottom: 1.5px solid #e6d7c4; break-after: avoid; }
+  .chap:first-child { margin-top: 0; }
+  .chap .no { width: 8mm; height: 8mm; border-radius: 50%; background: var(--pink); color: #fff; display: grid; place-items: center; font: 600 9pt 'Noto Serif CJK SC', serif; flex: none; }
+  .chap h2 { margin: 0; flex: 1; font: 600 17pt 'Noto Serif CJK SC', serif; color: var(--ink); }
+  .chap .en { font-size: 7pt; letter-spacing: .08em; color: #d3bfae; }
+  .new-tag { display: inline-block; vertical-align: middle; margin-left: 2mm; padding: 0 2mm; border-radius: 2mm; background: var(--pink); color: #fff; font: 600 7pt 'Noto Sans CJK SC', sans-serif; letter-spacing: .05em; }
+  h3 { margin: 6mm 0 2mm; font: 600 12pt 'Noto Serif CJK SC', serif; color: var(--pink); break-after: avoid; }
+  .intro { color: var(--ink2); margin-bottom: 4mm; }
+  .small { font-size: 8.4pt; color: var(--muted); }
+
+  /* 卡片 */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 3.5mm; margin: 3mm 0; align-items: start; }
+  .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3mm; margin: 3mm 0; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 3mm; padding: 3mm 4mm 3.5mm; break-inside: avoid; }
+  .card h4 { margin: 0 0 1mm; font: 600 10.5pt 'Noto Serif CJK SC', serif; color: var(--ink); }
+  .card p, .card li { font-size: 8.8pt; margin: 0 0 1mm; padding-left: 4mm; }
+  .card.pink { background: #fff3f4; border-color: #f2cdd5; }
+  .page-card .en { display: block; font-size: 7pt; letter-spacing: .08em; color: var(--muted); margin: 1mm 0 2mm; }
+  .page-card h4 { font-size: 11pt; }
+  .page-card p { padding-left: 0; }
+
+  /* 提示条 */
+  .tip { margin: 3.5mm 0; padding: 3mm 4mm; border-radius: 2.5mm; border-left: 3px solid; break-inside: avoid; color: var(--ink); }
+  .tip.g { background: var(--green-bg); border-color: var(--green); }
+  .tip.r { background: var(--red-bg); border-color: var(--red); }
+  .tip b { margin-right: 2mm; }
+
+  /* 编号步骤 */
+  ol.steps { list-style: none; counter-reset: s; margin: 2mm 0; padding: 0; }
+  ol.steps > li { counter-increment: s; position: relative; padding-left: 8mm; margin: 0 0 2.4mm; color: var(--ink); break-inside: avoid; }
+  ol.steps > li::before { content: counter(s); position: absolute; left: 1mm; top: 0; color: var(--pink); font: 8.5pt 'Noto Serif CJK SC', serif; }
+  ol.steps > li .d { display: block; color: var(--ink2); font-size: 8.8pt; }
+  ul.dots { list-style: none; padding: 0; margin: 2mm 0; }
+  ul.dots li { position: relative; padding-left: 5mm; margin-bottom: 1.6mm; color: var(--ink); }
+  ul.dots li::before { content: "·"; position: absolute; left: 1mm; color: var(--pink); font-weight: 700; }
+
+  /* 表格 */
+  table { width: 100%; border-collapse: collapse; margin: 2.5mm 0 3mm; font-size: 8.8pt; break-inside: auto; }
+  th { background: var(--head); color: var(--ink); font-weight: 500; text-align: left; }
+  th, td { border: 1px solid var(--line); padding: 2.2mm 3mm; vertical-align: top; }
+  tr { break-inside: avoid; }
+  td:first-child { color: var(--ink); }
+  table.kv td:first-child { background: #fcf6ea; width: 30mm; color: var(--ink2); }
+  .boxed { background: var(--card); border: 1px solid var(--line); border-radius: 3mm; padding: 3mm 3mm 1mm; break-inside: avoid; }
+  .boxed > h4 { margin: 0 0 1mm 1mm; font: 600 10.5pt 'Noto Serif CJK SC', serif; color: var(--ink); }
+
+  .moods { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3mm; margin: 2mm 0; }
+  .moods div { border: 1px solid var(--line); border-top: 3px solid; border-radius: 2.5mm; padding: 2.5mm 4mm; background: #fffdf8; color: var(--ink); font-size: 9pt; }
+
+  /* 目录 */
+  .toc { margin-top: 2mm; }
+  .toc a { display: flex; align-items: baseline; gap: 2mm; padding: 1.75mm 0; color: var(--ink); text-decoration: none; font-size: 10pt; }
+  .toc .t { white-space: nowrap; }
+  .toc .t i { font-style: normal; display: inline-block; min-width: 6mm; }
+  .toc .dots { flex: 1; border-bottom: 1.5px dotted #b9a99a; transform: translateY(-1mm); }
+  .toc .p { min-width: 5mm; text-align: right; }
+  .legend { margin-top: 3mm; }
+  .legend .row { display: flex; align-items: center; gap: 8mm; padding: 2.5mm 0 2.5mm 3mm; border-bottom: 1px solid #f0e6d8; color: var(--ink2); }
+  .legend .sw { width: 12mm; height: 7mm; border-radius: 1.5mm; border: 1px solid; border-left-width: 3px; flex: none; }
+  .legend .n { width: 12mm; flex: none; white-space: nowrap; letter-spacing: .15em; color: var(--pink); font-family: 'Noto Serif CJK SC', serif; letter-spacing: .3em; }
+
+  .faq .card { margin-bottom: 2.2mm; }
+  .faq .card p { padding-left: 4mm; }
+  .end { margin-top: 5mm; }
+  .page-break { break-before: page; }
+</style>
+</head>
+<body>
+
+<!-- ================= 封面 ================= -->
+<section class="cover">
+  <div class="tape"></div>
+  <div class="kicker">DAILY NOTES</div>
+  <h1>日拾</h1>
+  <div class="sub">使用手册</div>
+  <div class="lead">把今天要做的事写在一页纸上，做完打个勾；<br>晚上回来，和这一天的自己说两句话，再留一张照片。</div>
+  <div class="marks">√ ★ ○ ～</div>
+  <div class="who">
+    <h4>这份手册写给谁</h4>
+    第一次打开日拾的你。顺着读下去，五分钟就能上手；<br>
+    已经用过一阵子的话，可以直接翻到第 5、10、11 章，那里藏着省时间的用法；<br>
+    想看这一版新加了什么，翻到第 8 章「③ 放几张照片」。最后一页是速查表，可以打印。
+  </div>
+  <div class="motto">一天一天，拾起来</div>
+  <div class="foot"><span>适用于 iPhone · iPad · Mac</span><span>版本 v0.9<span class="new">新增复盘照片</span></span></div>
+</section>
+
+<!-- ================= 目录 ================= -->
+<div class="chap"><span class="no">目</span><h2>目录</h2><span class="en">CONTENTS</span></div>
+<nav class="toc">
+  <a><span class="t"><i>1</i>日拾是什么</span><span class="dots"></span><span class="p" data-toc="c1"></span></a>
+  <a><span class="t"><i>2</i>五分钟上手</span><span class="dots"></span><span class="p" data-toc="c2"></span></a>
+  <a><span class="t"><i>3</i>「今天」：一天的主页面</span><span class="dots"></span><span class="p" data-toc="c3"></span></a>
+  <a><span class="t"><i>4</i>「编辑任务」：一次写完整天</span><span class="dots"></span><span class="p" data-toc="c4"></span></a>
+  <a><span class="t"><i>5</i>每周固定任务</span><span class="dots"></span><span class="p" data-toc="c5"></span></a>
+  <a><span class="t"><i>6</i>时间轴：截止日期与倒计时</span><span class="dots"></span><span class="p" data-toc="c6"></span></a>
+  <a><span class="t"><i>7</i>日历：翻看走过的每一天</span><span class="dots"></span><span class="p" data-toc="c7"></span></a>
+  <a><span class="t"><i>8</i>今日复盘：心情、三句话和照片</span><span class="dots"></span><span class="p" data-toc="c8"></span></a>
+  <a><span class="t"><i>9</i>小记：灵感与随手记</span><span class="dots"></span><span class="p" data-toc="c9"></span></a>
+  <a><span class="t"><i>10</i>提醒：07:30 与 23:00</span><span class="dots"></span><span class="p" data-toc="c10"></span></a>
+  <a><span class="t"><i>11</i>多设备同步</span><span class="dots"></span><span class="p" data-toc="c11"></span></a>
+  <a><span class="t"><i>12</i>备份、恢复与账号</span><span class="dots"></span><span class="p" data-toc="c12"></span></a>
+  <a><span class="t"><i>13</i>十个省时间的小技巧</span><span class="dots"></span><span class="p" data-toc="c13"></span></a>
+  <a><span class="t"><i>14</i>常见问题</span><span class="dots"></span><span class="p" data-toc="c14"></span></a>
+  <a><span class="t"><i>附</i>一页速查</span><span class="dots"></span><span class="p" data-toc="c15"></span></a>
+</nav>
+
+<div class="tip g"><b>先记住三个位置</b>底部四个按钮是主要页面；右上角的齿轮是设置；「今天」页右上角的固定任务入口（图钉图标）放每周重复的事。其余操作都从这三处展开。</div>
+
+<h3>这份手册的三种提示</h3>
+<div class="legend">
+  <div class="row"><span class="sw" style="background:var(--green-bg);border-color:var(--green)"></span>绿色提示 —— 更省事的做法、补充说明，不看也能用，看了更顺。</div>
+  <div class="row"><span class="sw" style="background:var(--red-bg);border-color:var(--red)"></span>红色提醒 —— 容易出错的地方，比如「这样改会动到历史记录」。</div>
+  <div class="row"><span class="n">1 2 3</span>编号步骤 —— 按顺序操作，一步一行，做完打勾。</div>
+</div>
+
+<!-- ================= 1 ================= -->
+<div class="chap page-break" id="c1"><span class="no">1</span><h2>日拾是什么</h2><span class="en">WHAT IT IS</span></div>
+<p class="intro">日拾是一个「一天一页」的小本子。它不做复杂的项目管理，只做三件事：把今天要做的事写清楚、做完打勾、晚上留几句话（和一两张照片）给自己。写着写着，日历会攒下你走过的每一天。</p>
+<div class="grid4">
+  <div class="card pink page-card"><h4>今天</h4><span class="en">TODAY</span><p>当天的任务与复盘</p></div>
+  <div class="card page-card"><h4>时间轴</h4><span class="en">TIMELINE</span><p>有截止日期的任务</p></div>
+  <div class="card page-card"><h4>小记</h4><span class="en">NOTES</span><p>灵感与随手记</p></div>
+  <div class="card page-card"><h4>日历</h4><span class="en">CALENDAR</span><p>每个月的记录</p></div>
+</div>
+<div class="grid2">
+  <div class="card"><h4>四个页面</h4>
+    <p>今天：一天的任务清单，按时间排成一条时间线，点圆圈勾选完成；最下面是今日复盘。</p>
+    <p>时间轴：填了截止日期的任务，自动按日期串成倒计时。</p>
+    <p>小记：突然想到的点子、随手要记的小事。</p>
+    <p>日历：每个月的完成情况、心情、星星和照片标记。</p>
+  </div>
+  <div class="card"><h4>两个藏起来的入口</h4>
+    <p>齿轮（右上角）：账号与同步、提醒、导出备份。</p>
+    <p>图钉（「今天」页右上角）：每周固定任务。比如「周一到周五 7:30 背单词」，设一次，每天自动出现。</p>
+  </div>
+</div>
+<h3>它和别的待办 App 有什么不同</h3>
+<ul class="dots">
+  <li>一天一页，而不是一条长长的清单。没做完的事不会永远堆在列表顶端 —— 今天做几件，你说了算。</li>
+  <li>固定任务和临时任务分得清。课表、健身这种每周重复的，改一次只影响以后；某一天请假就「只改这一天」，历史记录不会变。</li>
+  <li>它记得你的心情和画面。每晚复盘选一个表情、放一两张照片，日历上就能看到这个月哪几天是笑着过的。</li>
+  <li>不用装 App。浏览器打开、添加到主屏幕，和原生 App 一样用；断网也能写，联网自动同步。</li>
+</ul>
+<div class="tip g"><b>不注册也能用。</b>不登录时数据只存在这台设备上；登录后才在 iPhone / iPad / Mac 之间同步。不妨先随便用两天，觉得顺手了再登录。</div>
+
+<!-- ================= 2 ================= -->
+<div class="chap" id="c2"><span class="no">2</span><h2>五分钟上手</h2><span class="en">QUICK START</span></div>
+<ol class="steps">
+  <li><b>把它放到桌面上。</b><span class="d">iPhone / iPad：用 Safari 打开网址 → 底部「分享」→ 往下找「添加到主屏幕」→ 添加。Mac：Safari 菜单「文件 → 添加到程序坞」，或 Chrome 地址栏右侧的「安装」图标。Windows / 安卓：Chrome 右上角菜单 →「安装应用」或「添加到主屏幕」。</span></li>
+  <li><b>从桌面图标打开它。</b><span class="d">之后每次都从图标进，而不是从浏览器书签进 —— 只有这样才能开启推送、全屏显示。</span></li>
+  <li><b>（可选）登录账号。</b><span class="d">齿轮 →「账号与同步」→ 填邮箱和密码（至少 6 位）→「注册新账号」。已有账号就点「登录」。登录后，其它设备填同样的邮箱密码就能看到同一份数据。</span></li>
+  <li><b>写下今天的第一件事。</b><span class="d">「今天」页 →「添加这一天的任务」→ 输入任务名 → 需要就填开始和结束时间 → 右上角「保存」。</span></li>
+  <li><b>做完点一下圆圈。</b><span class="d">圆圈变成勾，任务变淡，顶部进度条往前走。点错了再点一次就取消。</span></li>
+</ol>
+<div class="tip r"><b>第一次打开时请允许通知。</b>系统会问「日拾 想要发送通知」，点「允许」，这样每天 07:30 和 23:00 的提醒才收得到。当时点了「不允许」也没关系，之后可以在 iPhone「设置 → 通知 → 日拾」里打开。</div>
+<h3>登录之后，建议顺手做的两件事</h3>
+<div class="grid2">
+  <div class="card"><h4>① 开启准点推送</h4><p>齿轮 →「提醒」→「开启准点推送」→ 允许通知。每台设备各开一次。开了之后，即使 App 完全关闭也会在 07:30 / 23:00 准时收到提醒（详见第 10 章）。</p></div>
+  <div class="card"><h4>② 建一条固定任务</h4><p>「今天」页右上角点图钉 → 右下角「＋」→ 比如「周一到周五 07:40 背单词」，选好星期和时间，保存。以后每天自动出现。</p></div>
+</div>
+
+<!-- ================= 3 ================= -->
+<div class="chap" id="c3"><span class="no">3</span><h2>「今天」：一天的主页面</h2><span class="en">TODAY</span></div>
+<p class="intro">打开日拾看到的就是这一页。它只回答一个问题：今天要做什么，做到哪儿了。</p>
+<div class="boxed"><h4>从头到尾看一遍</h4>
+<table>
+  <tr><th style="width:26mm">位置</th><th>说明</th></tr>
+  <tr><td>切换日期</td><td>标题两边的 ‹ › 是前一天 / 后一天；直接点「今天」这两个字会弹出日期选择器，可以跳到很久以前或以后。不是今天时，下方会多一个「↩ 回到今天」。</td></tr>
+  <tr><td>任务顺序</td><td>自动按开始时间排：早的事在上面。没填时间的排在最后，保持你写的顺序。</td></tr>
+  <tr><td>打勾</td><td>点左边的圆圈，或直接点任务文字，都能标记完成。圆圈打勾时会轻轻震动一下。</td></tr>
+  <tr><td>进度</td><td>列表上方显示「已完成 2/5」，下面一条细线随之变长。</td></tr>
+  <tr><td>图钉标记</td><td>任务名前面带图钉的是每周固定任务。点它的文字不会打勾，而是弹出这一天的操作菜单（见第 5 章）。</td></tr>
+  <tr><td>时间</td><td>有开始时间的显示成「08:30」，有结束时间时下面再跟一个较淡的时间，像「08:30 ~09:15」。</td></tr>
+</table></div>
+<h3>页面上的另外几条横条</h3>
+<div class="grid2">
+  <div class="card"><h4>截止提醒条</h4><p>今天起 7 天内有任务要截止时，页面顶部会出现一条提醒，写着任务名和「还有 3 天」。点一下直接跳到时间轴。</p></div>
+  <div class="card"><h4>休息日</h4><p>某天不想做固定任务（出去玩、生病），点页面底部的「设为休息日」，这天的固定任务全部跳过。取消就点「取消休息」。</p></div>
+</div>
+<div class="card"><h4>页面底部的小字</h4><p>如果这天跳过了某些固定任务，底部会写「这天跳过了 2 个固定任务」，后面跟着「恢复「背单词」」这样的链接，点一下就能恢复，不用回固定任务页。</p></div>
+<div class="tip g"><b>最下面是今日复盘。</b>今天和过去的日子都有，可以选心情、写几句话、放几张照片，写完自动保存；未来的日子不显示（还没过，没什么可复盘的）。详见第 8 章。</div>
+<div class="tip r"><b>空白的页面不是出错。</b>这天还没有任务时，会看到一只兔子说「这一页还是空白的～」，点下面的按钮就能开始写。</div>
+
+<!-- ================= 4 ================= -->
+<div class="chap" id="c4"><span class="no">4</span><h2>「编辑任务」：一次写完整天</h2><span class="en">EDIT A DAY</span></div>
+<p class="intro">在「今天」页点「编辑这一天的任务」就进来了。一行一个任务，像在纸上列清单一样。</p>
+<ol class="steps">
+  <li>输入任务内容。每一行上面是任务名（最多 80 个字）。</li>
+  <li>按回车，自动多一行。在任务名输入框里敲回车，光标会跳到下一行，可以一路写下去，不用一直点「添加一行」。</li>
+  <li>填时间（可以不填）。每行下面有「开始 至 结束」两个时间框。只填开始也行，只填结束也行，都不填也行 —— 不填的排在当天最后。</li>
+  <li>保存。右上角或页面底部的「保存」都可以，两处效果一样。</li>
+</ol>
+<div class="grid2">
+  <div class="card"><h4>删除 vs 跳过</h4><p>右边的 ✕ 有两种意思：普通任务＝删掉这一行，保存后就不见了；固定任务＝只是「这一天跳过」，每周安排不受影响。想彻底取消这项固定任务，要去图钉页面里停掉或删除。</p></div>
+  <div class="card"><h4>这里的修改只影响这一天</h4><p>带图钉的任务，在这一页改名字、改时间，只对这一天生效，旁边会提示「每周固定 · 这里改只影响这一天」。改过的日子会记住「今日已调整」，以后其它日子还是原来的样子。</p></div>
+</div>
+<div class="tip g"><b>小窍门：</b>早上一次把一天写完（包括「晚上跑步」这种），白天就只看「今天」页打勾，不再反复改清单 —— 改清单最耗神。</div>
+
+<!-- ================= 5 ================= -->
+<div class="chap" id="c5"><span class="no">5</span><h2>每周固定任务</h2><span class="en">WEEKLY ROUTINES</span></div>
+<p class="intro">课表、背单词、健身、每周一次的例会 —— 这类「每周都会重复」的事，不必每天手动写，交给「每周固定」。入口在「今天」页右上角的图钉，页面按周一 → 周日分组，每项写着时间、星期和有效期。</p>
+<h3>新建一条固定任务</h3>
+<ol class="steps">
+  <li>任务名，比如「背 50 个雅思单词」。</li>
+  <li>每周哪几天：点星期几的小方块，可以多选。下面有快捷键：「工作日」「周一至周六」「每天」「周末」。</li>
+  <li>开始 / 结束时间：决定它出现在当天时间线的哪个位置。不填就排在最后。</li>
+  <li>从哪天开始：默认今天。到哪天：不填就是长期一直重复；填了到期自动结束，收进「已结束」里。</li>
+  <li>保存。以后每个匹配的日子，「今天」页都会自动多出这一项。</li>
+</ol>
+<h3>四种「改」的方式，别用错</h3>
+<p>在「今天」页点一条固定任务的名字，会弹出菜单，每一行对应一种改法：</p>
+<table>
+  <tr><th style="width:38mm">菜单项</th><th style="width:40mm">影响范围</th><th>什么时候用</th></tr>
+  <tr><td>标记完成</td><td>只有这一天</td><td>做完了，等于打勾。</td></tr>
+  <tr><td>只改这一天</td><td>只有这一天</td><td>今天这门课换到 10 点、今天任务改成「复习」，但下周照旧。</td></tr>
+  <tr><td>修改以后的每周安排</td><td>从今天起往后所有日子</td><td>课表变了、时间永久调整。以前的记录不受影响，旧日子仍是原来的样子。</td></tr>
+  <tr><td>这一天跳过</td><td>只有这一天</td><td>今天请假、出去玩。页面底部可一键恢复。</td></tr>
+  <tr><td>从这天起不再安排</td><td>从今天起往后</td><td>这门课结束了。以前做过的记录会保留，能在「已结束」里查看。</td></tr>
+</table>
+<h3>还有两个实用功能</h3>
+<div class="grid2">
+  <div class="card"><h4>暂停一段时间</h4><p>在固定任务页点开一条任务，编辑时有「暂停一段时间」：填「从」和「到」，这期间它不出现，但不算结束，到日子自动恢复。适合考试周、寒假。</p><p class="small">填了「从」不填「到」＝从那天起一直暂停，想恢复时点「清除暂停」。</p></div>
+  <div class="card"><h4>停止 vs 彻底删除</h4><p>从今天起停止：不再安排，但过去每天的完成记录都留着 —— 想回顾「这学期背了多少天单词」就靠它。</p><p>彻底删除：连以前的记录一起删掉，不可恢复。建议默认用「停止」。</p></div>
+</div>
+<div class="tip r"><b>改了每周安排，历史不会跟着变。</b>这是故意的：过去的日子应该保持你当时真实的样子。所以只想改某一天，请用菜单里的「只改这一天」，不要用「修改以后的每周安排」。</div>
+
+<!-- ================= 6 ================= -->
+<div class="chap" id="c6"><span class="no">6</span><h2>时间轴：截止日期与倒计时</h2><span class="en">DEADLINES</span></div>
+<p class="intro">有些事不属于某一天，而是「某天之前必须交」：论文、考试、报名、还书。这类事放进时间轴。</p>
+<ol class="steps">
+  <li>底部第二个按钮进「时间轴」。</li>
+  <li>上面填任务名称（如「雅思考试」）和截止日期（默认填好一周后，可改）。</li>
+  <li>点「＋ 添加」。它会自动插到时间线上正确的位置，按月份分组。</li>
+</ol>
+<h3>怎么看倒计时</h3>
+<table>
+  <tr><th style="width:30mm">徽章</th><th style="width:44mm">意思</th><th>显示效果</th></tr>
+  <tr><td>今天</td><td>今天截止</td><td>最醒目，红色</td></tr>
+  <tr><td>N 天</td><td>还有 N 天</td><td>2 天以内偏红，7 天以内提醒色，更远是普通色</td></tr>
+  <tr><td>过了 N 天</td><td>已过期还没勾</td><td>变灰，提醒你处理或删掉</td></tr>
+  <tr><td>完成</td><td>已勾选</td><td>整条变淡，收进「已完成」里</td></tr>
+</table>
+<div class="grid2">
+  <div class="card"><h4>完成与修改</h4><p>点左边的圆圈标记完成；点任务名字打开修改窗口，可以改名字、改日期，或者删除。</p></div>
+  <div class="card"><h4>自动提醒</h4><p>截止前 7 天、5 天、2 天、当天，早上 07:30 的提醒里会带上它；「今天」页顶部也会出现一条提醒横条。</p></div>
+</div>
+<div class="tip g"><b>和「今天」的分工：</b>「今天」页放着今天要动手做的事；时间轴放着「期限」。同一件事可以两边都有 —— 比如时间轴里有「12 月 20 日交毕业论文」，今天这页写「写文献综述 2 小时」。</div>
+
+<!-- ================= 7 ================= -->
+<div class="chap" id="c7"><span class="no">7</span><h2>日历：翻看走过的每一天</h2><span class="en">CALENDAR</span></div>
+<p class="intro">底部第四个按钮。这里不是用来安排计划的，而是用来回头看的：这个月完成了多少、哪几天全部做完、心情怎么样、哪天留了照片。</p>
+<div class="card"><h4>它是倒着排的</h4><p>月份从上往下越来越旧：最上面是本月（或最晚有任务的月份），往下滑是上个月、上上个月……正好符合「往回翻」的习惯。没有任务的月份会自动隐藏（本月除外），所以列表不会空荡荡地拉很长。</p></div>
+<h3>每一格小卡上有什么</h3>
+<ul class="dots">
+  <li>日期数字：今天那一格会高亮，标「今日」。</li>
+  <li>当天任务：最多显示 3 条，已完成的带 √ 且更淡；超过 3 条显示「+2」。</li>
+  <li>★ 小星星：这天的任务全部完成才会出现，是留给你自己的奖励。</li>
+  <li>心情：这天写了复盘并选了心情，日期旁边会有一个小表情。</li>
+  <li>📷 照片：这天的复盘放了照片，日期旁边会多一个小相机。点进去就能看。<span class="new-tag">新</span></li>
+  <li>未来日期：还没到、也还没安排任务的日子不显示；安排了任务才会出现，并标「明日任务」「后天」「5 天后」。</li>
+  <li>每月标题：左边是月份和季节贴纸，右边写「完成 N 项」。</li>
+</ul>
+<div class="tip g"><b>点任意一格</b>会直接跳到那一天。想补记上周某天做过的事、或补写那天的复盘，从日历点进去最快。</div>
+<div class="grid2">
+  <div class="card"><h4>本月完成数量</h4><p>每月标题右边的「完成 37 项」是这个月所有勾掉的任务总数（含固定任务）。月底看一眼，比任何打卡 App 都直观。</p></div>
+  <div class="card"><h4>连成一片的小星星</h4><p>一片 ★ 连着的那几天，就是状态最好的时候。翻回去看看当时写了什么、拍了什么，往往能找到自己的节奏。</p></div>
+</div>
+
+<!-- ================= 8 ================= -->
+<div class="chap" id="c8"><span class="no">8</span><h2>今日复盘：心情、三句话和照片</h2><span class="en">DAILY REVIEW</span></div>
+<p class="intro">「今天」页任务列表下面那张信纸。它只有三个动作：选一个心情，写三句话，想的话再放几张照片。</p>
+<h3>① 选心情</h3>
+<div class="moods">
+  <div style="border-top-color:#f2b8c4">超开心</div><div style="border-top-color:#f6c9cf">不错</div><div style="border-top-color:#b9d3ef">平静</div><div style="border-top-color:#cfbde8">有点累</div><div style="border-top-color:#c7ccd4">低落</div>
+</div>
+<p class="small">五种心情：超开心 / 不错 / 平静 / 有点累 / 低落。点一下选中，再点同一个可以取消；选中的心情会显示在日历上，一个月的心情分布一眼就能看出来。</p>
+<h3>② 写三件事</h3>
+<table class="kv">
+  <tr><td>今天的感受</td><td>有什么开心或难忘的小事。一句也行。</td></tr>
+  <tr><td>小错误 / 踩过的坑</td><td>写下来就是进步。今天哪里绕了远路、忘了什么。</td></tr>
+  <tr><td>感想 / 想对明天的自己说</td><td>留一句温柔的话，明天的你会看到。</td></tr>
+</table>
+<div class="grid2">
+  <div class="card"><h4>边写边存</h4><p>不用点保存。停手的一瞬间就存好了，右上角出现「已保存 ✓」。写着写着切走、关掉 App 都不会丢。</p></div>
+  <div class="card"><h4>写长了也不挤</h4><p>每格最多 2000 字。字多时只显示前几行，下面出现「展开全文」，点开看全部。</p></div>
+</div>
+
+<h3>③ 放几张照片 <span class="new-tag">v0.9 新增</span></h3>
+<p>今天吃到的好吃的、看到的晚霞、写满的笔记本 —— 配上一张照片，过几个月翻日历时会记得更清楚。</p>
+<ol class="steps">
+  <li><b>添加。</b><span class="d">在心情下面点「📷 添加照片」，从相册选或直接拍照。一次可以选好几张，<b>每天最多 3 张</b>；超出的会提示「每天最多 3 张」。</span></li>
+  <li><b>查看。</b><span class="d">点缩略图看大图，再点一下关闭。</span></li>
+  <li><b>删除。</b><span class="d">点缩略图右上角的 ×，确认后删除。云端的那一份也会一起删掉。</span></li>
+</ol>
+<div class="grid2">
+  <div class="card"><h4>没网也能加</h4><p>照片先存在这台设备上，马上就能看到；左下角会显示「☁︎ 待上传」。联网后自动上传，这个标记就会消失。</p></div>
+  <div class="card"><h4>换台设备也能看</h4><p>登录同一个账号，打开那天的复盘，照片会自动下载显示。之后就存在本机，再看不费流量。</p></div>
+</div>
+<div class="grid2">
+  <div class="card"><h4>不占地方</h4><p>照片会在手机上先压缩，每张只有一两百 KB，原图不会被改动。</p></div>
+  <div class="card"><h4>只有你能看到</h4><p>照片存在按账号隔离的私密空间里，朋友用同一个日拾也看不到你的照片。</p></div>
+</div>
+<div class="tip r"><b>同一天的复盘，尽量只在一台设备上写。</b>两台设备同时改同一天的复盘，会以最后保存的那次为准，另一边刚写的字或刚加的照片可能被覆盖。平时用一台写，就不会碰到。</div>
+<div class="tip g"><b>23:00 的提醒会顺带提醒你写复盘。</b>如果今天还有没做完的任务，提醒里会先列出来，再补一句「做完记得写写今日复盘哦」。</div>
+<div class="tip r"><b>补写。</b>过去的日子也能写、也能补照片。从日历点进某一天，往下滑就是那天的复盘 —— 想起来随时补，不会因为过了零点就写不了。</div>
+
+<!-- ================= 9 ================= -->
+<div class="chap" id="c9"><span class="no">9</span><h2>小记：灵感与随手记</h2><span class="en">QUICK NOTES</span></div>
+<p class="intro">底部第三个按钮。它解决的是「现在不方便安排，但不想忘」的东西，分两种。</p>
+<div class="grid2">
+  <div class="card"><h4>灵感</h4><p>想法、点子、想做的事。记下来之后可以慢慢判断它值不值得做，状态一共五种。</p><p>待定 → 可行 → 已执行</p><p>也可以标「不可行，修改为…」（写下改后的版本）或「不可行，放弃」。任何时候都能「恢复为待定」，重新想一遍。</p></div>
+  <div class="card"><h4>随手记</h4><p>想起的小事，比如「买洗衣液」「问老师作业格式」。记完可以勾选完成 / 标为未完成，像一张便签。</p><p>两种都支持「安排到某一天的任务」，把它变成某天的正式任务。</p></div>
+</div>
+<h3>怎么用这一页</h3>
+<ol class="steps">
+  <li>顶部切换类型：点「灵感」或「随手记」，决定这条记成哪种。</li>
+  <li>写一句话（最多 500 字），点「记下来」。列表按时间倒序，最新的在最上面。</li>
+  <li>筛选：中间的「全部 / 灵感 / 随手记」切换大类；选灵感后再用下面的小标签分「待定·可行 / 已执行 / 已修改 / 已放弃 / 全部」。</li>
+  <li>点卡片打开菜单：改状态、安排到某一天、编辑文字、删除。</li>
+</ol>
+<div class="tip g"><b>最有用的一条路径：</b>走路时想到一个点子 → 记成灵感（10 秒）→ 周末翻一遍，标「可行」→ 点「安排到某一天」→ 它就成了那天的任务。想法不会烂在备忘录里。</div>
+<div class="tip r"><b>注意。</b>「安排到某一天」是复制成任务，原来那条小记还留着。想清理的话，可以接着点「删除这条小记」。</div>
+
+<!-- ================= 10 ================= -->
+<div class="chap" id="c10"><span class="no">10</span><h2>提醒：07:30 与 23:00</h2><span class="en">REMINDERS</span></div>
+<p class="intro">日拾每天只提醒两次，都在你需要的时刻：</p>
+<table>
+  <tr><th style="width:26mm">时间</th><th>提醒内容</th></tr>
+  <tr><td>07:30</td><td>今天的任务清单（含每周固定任务，带时间）；时间轴里截止前 7 天 / 5 天 / 2 天 / 当天的任务</td></tr>
+  <tr><td>23:00</td><td>今天还没完成的任务；如果都做完了，就温柔地提醒你写今日复盘</td></tr>
+</table>
+<h3>两种提醒方式，用哪种？</h3>
+<div class="grid2">
+  <div class="card"><h4>App 内提醒（默认）</h4><p>打开 App 或切回前台时检查，到点就弹通知；错过的时间点会在下次打开时补上。</p><p class="small">缺点：App 被系统彻底关掉后不会响。</p></div>
+  <div class="card"><h4>准点推送（推荐）</h4><p>由云端服务器准时发出，App 完全关闭也能收到，时间误差一般在几十秒内。</p><p>需要在每台设备上各开一次，且必须先登录账号。</p></div>
+</div>
+<h3>开启准点推送</h3>
+<ol class="steps">
+  <li>确认这台设备上已经登录账号（齿轮里能看到自己的邮箱）。</li>
+  <li>齿轮 →「提醒」→ 点「开启准点推送」。</li>
+  <li>系统弹窗点「允许」。</li>
+  <li>看到「准点推送：已开启」就成了。iPhone、iPad、Mac 各做一次。</li>
+</ol>
+<div class="tip r"><b>iPhone / iPad 必须「添加到主屏幕」后再开启。</b>用 Safari 直接打开网页时，苹果不允许网页推送，设置里会显示「需先添加到主屏幕」。如果显示「通知被拒绝」，请到 iOS「设置 → 通知 → 日拾」里打开允许通知。</div>
+<div class="tip g"><b>收不到？先查这三样：</b>① 是否从主屏幕图标打开的；② 系统里日拾的通知是否允许；③ 是否开了专注模式 / 勿扰模式（会拦掉通知）。开了推送后，App 自己不会再重复弹同一条提醒，不会收到两遍。</div>
+
+<!-- ================= 11 ================= -->
+<div class="chap" id="c11"><span class="no">11</span><h2>多设备同步</h2><span class="en">SYNC</span></div>
+<p class="intro">在 iPhone、iPad、Mac 上登录同一个账号，就能看到同一份数据。在手机上勾掉的任务，几秒钟后 iPad 上也是勾好的。</p>
+<h3>什么时候会自动同步</h3>
+<ul class="dots">
+  <li>每次修改后约 1.5 秒；</li>
+  <li>App 从后台回到前台时；</li>
+  <li>网络恢复时；</li>
+  <li>App 开着时，每 60 秒一次。</li>
+</ul>
+<p class="small">想立刻同步，去齿轮里点「立即同步」。断网时可以照常写，联网后会自己补传。复盘照片跟着一起：每次同步完成后，没上传的照片会在后台补传，删掉的照片也会从云端清掉。</p>
+<h3>齿轮上的小圆点</h3>
+<table class="kv">
+  <tr><td>灰色</td><td>还没登录，数据只在本机</td></tr>
+  <tr><td>绿色</td><td>已登录，同步正常</td></tr>
+  <tr><td>转圈</td><td>正在同步</td></tr>
+  <tr><td>红色</td><td>同步出错。点进去能看到原因（密码失效、网络问题等），点「立即同步」重试</td></tr>
+</table>
+<div class="tip r"><b>同一件事在两台设备上都被改过：以最后一次修改为准。</b>所以尽量不要两台设备同时改同一条任务、同一天的复盘。日常使用几乎碰不到，因为同步只差一两秒。</div>
+<div class="tip g"><b>在同一台设备上换账号登录：</b>本机会清掉上一个账号的本地缓存（云端数据还在，不会丢）。用原来的账号重新登录，数据会重新拉回来。</div>
+<div class="card"><h4>和朋友一起用</h4><p>每个账号的数据互相独立，看不到彼此的清单和照片。朋友打开同一个网址、注册自己的账号即可。（注册人数有上限，具体见布置这个 App 的人给的说明。）</p></div>
+
+<!-- ================= 12 ================= -->
+<div class="chap" id="c12"><span class="no">12</span><h2>备份、恢复与账号</h2><span class="en">BACKUP &amp; ACCOUNT</span></div>
+<h3>导出备份</h3>
+<p>齿轮 →「数据」→「导出备份」。会下载一个 <span class="serif">日拾备份-2026-11-13.json</span> 这样的文件，里面是你所有的任务、固定任务、小记和复盘文字，纯文本，可以用记事本打开看。</p>
+<p class="small">建议：换手机前、大改之前、每月一次，导出一份存到网盘或发给自己。</p>
+<div class="tip r"><b>备份文件里没有照片。</b>照片存在云端，换设备时登录同一个账号，打开复盘就会自动下载回来；只导入备份文件的话，那几天会只剩文字。</div>
+<h3>导入备份</h3>
+<p>齿轮 →「数据」→「导入备份」→ 选那个 .json 文件，看到「导入成功」就好了。导入是合并，不是覆盖：同一条记录以备份里的为准，备份里没有的东西不会被删掉。</p>
+<h3>账号相关的几件事</h3>
+<table class="kv">
+  <tr><td>修改密码</td><td>齿轮 →「修改密码」→ 输入两次新密码（至少 6 位）。之后各设备用新密码登录。</td></tr>
+  <tr><td>忘记密码</td><td>登录页点「忘记密码？」，填注册时用的邮箱，会收到一封重置邮件。点邮件里的链接回到日拾就能设新密码。（收不到就看垃圾箱；这个功能需要布置者已配好邮件服务。）</td></tr>
+  <tr><td>退出登录</td><td>齿轮 →「退出登录」。本机数据保留，但不再上传云端；重新登录后继续同步。退出前会提示你还有几条修改没上传。</td></tr>
+  <tr><td>注销账户</td><td>齿轮最下面的「注销账户」。会永久删除云端的全部任务、固定任务、小记、复盘<b>和照片</b>，所有设备都找不回来，需要输入「注销」两个字确认。注销前请先导出备份，想留的照片先存到相册。</td></tr>
+</table>
+<div class="tip r"><b>三重保险：</b>文字数据平时在「本机 + 云端」各一份；重要时刻再加一份手动导出的 JSON。三者互不依赖。照片在「本机 + 云端」各一份。</div>
+<div class="tip g"><b>数据存在哪里？</b>一份在你设备的浏览器本地存储里，登录后另一份在云端数据库（按账号隔离，只有你自己的账号能读写）。照片存在云端的私密存储空间，同样只有你自己能看。手动导出的 JSON 只在你手上。</div>
+
+<!-- ================= 13 ================= -->
+<div class="chap" id="c13"><span class="no">13</span><h2>十个省时间的小技巧</h2><span class="en">TIPS</span></div>
+<ol class="steps">
+  <li>回车换行。编辑页在任务名里按回车，立刻多一行，一口气列完不用点按钮。</li>
+  <li>只填开始时间就够。「08:30 开会」比「08:30–09:00 开会」好写，排序一样准确。</li>
+  <li>点日期文字跳转。「今天」这两个字可以点，会弹出日期选择器，直接跳去下周三。</li>
+  <li>临时改动别动每周设置。用固定任务菜单里的「只改这一天」，历史记录才不会被牵连。</li>
+  <li>考试周用「暂停」。一次性把健身、社团都暂停两周，考完自动恢复，不用一个个删。</li>
+  <li>灵感变任务。小记里点「安排到某一天」，点子就有了执行日期。</li>
+  <li>休息日。出去玩那天点「设为休息日」，固定任务全部让路，回来不用一条条补。</li>
+  <li>从日历补记。想补写上周的复盘、补一张照片，从日历点那一格进去，比一直按 ‹ 快得多。</li>
+  <li>看星星找节奏。日历上 ★ 连成一片的那几周，翻回去看当时写了什么，通常就是你的高效配方。</li>
+  <li>深色模式跟随系统。iPad / Mac 宽屏时，导航会变成左侧竖栏，屏幕用得更满。</li>
+</ol>
+<div class="tip g"><b>最后一条不算技巧：</b>每天只写 3–6 件事。写满二十条的那种清单，第二天就不想打开了。</div>
+
+<!-- ================= 14 ================= -->
+<div class="chap" id="c14"><span class="no">14</span><h2>常见问题</h2><span class="en">FAQ</span></div>
+<div class="faq">
+  <div class="card"><h4>打开是白屏，或者还是旧样子</h4><p>先下拉刷新。iPhone 上把日拾从后台完全关掉再打开一次；仍不行就检查网络（第一次加载需要联网，之后离线也能开）。</p></div>
+  <div class="card"><h4>提醒不准时 / 收不到，能改时间吗</h4><p>大概率是没开准点推送：按第 10 章开启，并确认是从主屏幕图标打开的。提醒时间固定为 07:30 和 23:00，页面内不能改；觉得太早或太晚，可在系统通知设置里把日拾静音或关闭。</p></div>
+  <div class="card"><h4>看不到「📷 添加照片」 <span class="new-tag">新</span></h4><p>说明手机上还是旧版本。把日拾从后台完全关掉，再打开一两次就会更新到新版。</p></div>
+  <div class="card"><h4>照片一直显示「☁︎ 待上传」，或在另一台设备上显示「未同步」 <span class="new-tag">新</span></h4><p>「待上传」：检查这台设备是否联网、是否已登录，联网打开日拾后会自动补传。「未同步」：照片还在原来那台设备上没传上来，等那台设备联网打开一次就好。</p></div>
+  <div class="card"><h4>选照片时提示「这张图片打不开」 <span class="new-tag">新</span></h4><p>多半是 iPhone 的 HEIC 格式照片。在 iPhone 上用日拾选照片一般会自动转换；也可以在 iPhone「设置 → 相机 → 格式」选「兼容性最佳」，以后拍的照片就不会再遇到。</p></div>
+  <div class="card"><h4>换手机了，数据怎么过去</h4><p>新手机登录同一个账号，几秒后数据自动出现，照片打开时会自动下载；如果从没登录过，就在旧手机导出备份、新手机导入（照片不在备份里）。</p></div>
+  <div class="card"><h4>两个人能用同一个账号吗</h4><p>会看到彼此的清单和照片，不建议。每人注册一个账号，数据互不干扰。</p></div>
+  <div class="card"><h4>固定任务改了，以前的日子怎么也跟着变了</h4><p>正常不会变 —— 除非用了「修改以后的每周安排」并改了开始日期。只影响单天，请用「只改这一天」。</p></div>
+  <div class="card"><h4>不小心删了任务，能找回吗</h4><p>页面内没有撤销按钮。可用之前导出的备份导入恢复；或去另一台还没同步的设备上直接导出备份（先别让它同步）。</p></div>
+</div>
+
+<!-- ================= 附 ================= -->
+<div class="chap page-break" id="c15"><span class="no">附</span><h2>一页速查</h2><span class="en">CHEAT SHEET</span></div>
+<p class="small" style="padding-left:3mm">把这一页打印出来贴在桌边，忘了怎么操作时先看这里。</p>
+<table>
+  <tr><th style="width:44mm">我想……</th><th style="width:38mm">去哪里</th><th>怎么操作</th></tr>
+  <tr><td>写今天要做的事</td><td>今天</td><td>「编辑这一天的任务」→ 一行一个 → 保存</td></tr>
+  <tr><td>加一件每周重复的事</td><td>今天（右上角图钉）</td><td>「＋」→ 选星期和时间 → 保存</td></tr>
+  <tr><td>今天不想做固定任务</td><td>今天</td><td>底部「设为休息日」；或任务菜单里「这一天跳过」</td></tr>
+  <tr><td>临时改某一天的固定任务</td><td>今天</td><td>点任务名 →「只改这一天」</td></tr>
+  <tr><td>给今天的复盘加照片</td><td>今天 → 最下面的复盘</td><td>「📷 添加照片」→ 选图（每天最多 3 张）</td></tr>
+  <tr><td>记一个点子</td><td>小记</td><td>选「灵感」→ 写下来 → 之后标「可行」或「放弃」</td></tr>
+  <tr><td>把点子变成任务</td><td>小记 → 点卡片</td><td>「安排到某一天的任务」→ 选日期</td></tr>
+  <tr><td>记一件有截止日期的事</td><td>时间轴</td><td>填名称和日期 →「＋ 添加」</td></tr>
+  <tr><td>看看这个月做得怎么样</td><td>日历</td><td>往下滑，看每月「完成 N 项」、★ 和 📷</td></tr>
+  <tr><td>补写某天的复盘</td><td>日历 → 点那一格</td><td>往下滑到复盘，直接写、补照片</td></tr>
+  <tr><td>备份 / 换手机</td><td>齿轮 →「数据」</td><td>导出备份 / 导入备份（照片靠登录同一账号自动同步）</td></tr>
+  <tr><td>让提醒更准</td><td>齿轮 →「提醒」</td><td>开启准点推送（每台设备各一次）</td></tr>
+  <tr><td>忘记密码</td><td>登录页</td><td>「忘记密码？」→ 查收邮件 → 设置新密码</td></tr>
+</table>
+<div class="card end"><h4>写在最后</h4>
+  <p>这个本子的规则只有一条：写得完，才做得完。</p>
+  <p>如果某天什么都没做，那不是失败，只是那天有别的安排在排队。翻开新的一页，重新写三件事就好。</p>
+  <p>愿你的每一天都有勾可以打，也有话可以写，偶尔还有一张想留下的照片。</p>
+</div>
+<div class="tip g"><b>版本说明</b>手册对应 v0.9 的功能。和 v0.8 相比新增：今日复盘可以放照片（第 8 章），日历显示 📷 标记，注销账户时照片一起删除。以后功能有变化，以 App 里实际看到的为准；遇到手册没写到的情况，先在设置页看看有没有新选项。</div>
+
+</body>
+</html>
