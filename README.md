@@ -1,84 +1,179 @@
-# 日拾 · 使用指南
+# Rishi (日拾) — an offline-first daily planner & journal PWA
 
-一个自用的 PWA，三个页面：
+> A zero-dependency Progressive Web App I built for my own daily routine: plan the day, keep weekly habits, track deadlines and write a short evening review. It works offline, syncs across iPhone, iPad and Mac, and sends **server-side reminders at 07:30 and 23:00 even when the app is closed** — all on free tiers.
 
-- **今天**：一次填好一天的任务（每行一个，时间可不填），自动按时间排成当天时间线，点圆圈勾选完成；左右箭头或点日期切换到其他天
-- **📌 每周固定**：「今天」页右上角 📌 进入。设置每周哪几天、几点到几点、从哪天到哪天执行，会自动出现在每一天的任务里；某一天可以只改这一天、跳过或设为休息日；修改每周安排只影响以后，以前的记录保留；可以暂停一段时间（考试周、放假）
-- 普通任务和固定任务都可以填开始和结束时间
-- **时间轴**：添加有截止日期的任务，按日期自动串成时间线，可勾选完成
-- **🌙 今日复盘**：每天任务下面的温馨小信纸，每项字多时只预览前几行、可展开，选心情（日历上会显示），写「今天的感受」「小错误 / 踩过的坑」「感想 / 想对明天的自己说」，边写边自动保存；23:00 提醒会顺便提醒你写复盘
-- **小记**：底部第三个按钮。💡 灵感：之后可以标记「想法可行 / 已执行 / 不可行，修改为… / 不可行，放弃」，可以随时恢复为待定；📝 随手记：想起的小事随手一记，之后勾选完成或未完成。两种都能「安排到某一天的任务」
-- **日历**：周一到周日排列，按年月倒序（越新越靠上），每月一段向下滑；小卡显示当天任务（✓ 已完成 / ○ 未完成，全部完成会有小星星），未来日期只有安排了任务才显示（标「明日任务」「N天后」），过去没有任务的日子显示「无任务」；点小卡进入那一天
+**Language:** English | [简体中文](README.zh-CN.md)
 
-界面是可爱的手帐风格：点阵纸背景、和纸胶带、手写感标题（能访问 Google Fonts 时会加载站酷快乐体）
+![Tests](https://img.shields.io/badge/node%3Atest-16%20passing-brightgreen) ![Dependencies](https://img.shields.io/badge/dependencies-0-blue) ![PWA](https://img.shields.io/badge/PWA-offline--first-e57a95) ![Supabase](https://img.shields.io/badge/backend-Supabase-3ecf8e) ![Cost](https://img.shields.io/badge/running%20cost-%240-lightgrey)
 
-iPhone / iPad / Mac 用同一个账号登录即可同步。零依赖，不需要 `npm install`。
+<!-- TODO(shary): screenshots — docs/screenshots/{day,calendar,review,timeline}.png
+<table>
+  <tr>
+    <td><img src="docs/screenshots/day.png" width="200"/></td>
+    <td><img src="docs/screenshots/review.png" width="200"/></td>
+    <td><img src="docs/screenshots/calendar.png" width="200"/></td>
+    <td><img src="docs/screenshots/timeline.png" width="200"/></td>
+  </tr>
+  <tr>
+    <td align="center">Today</td><td align="center">Evening review</td><td align="center">Calendar</td><td align="center">Deadlines</td>
+  </tr>
+</table>
+-->
 
-## 分享给朋友 / 忘记密码 / 注销账户
+---
 
-- 朋友打开同一个网址注册自己的账号即可，数据互相独立；后台设置见 **`分享与账号设置指南.md`**
-- `js/config.js`：填入 Supabase 的 Project URL 和公开密钥后，设置页只需邮箱和密码
-- `supabase-update.sql`：已运行过 supabase.sql 的项目，再运行这个文件开启「注销账户」
+## Why I built it
 
-## 准点推送（App 关着也能准时提醒）
+I prepare for exams, applications and my graduation project at the same time, and I wanted one place that matches how I actually plan: write the whole day in one go, keep recurring habits without re-typing them, get nudged in the morning and at night, and look back at what I did. Existing apps were either too heavy or did not sync well across my phone, tablet and laptop, so I built my own.
 
-服务器端的代码和设置步骤在「日拾」旁边的 **日拾-云端推送** 文件夹里（那个文件夹有密钥，不要上传到 Netlify）。
+## Features
 
-## 1. 在 Mac 上本地运行
+| Area | What it does |
+|---|---|
+| **Today** | Type the whole day at once (one task per line, time optional); tasks become a timeline sorted by time; tick to complete |
+| **Weekly habits** | Recurring tasks by weekday and time range; edit just one day, skip a day, mark a rest day, pause for a period; changing the schedule only affects the future |
+| **Deadlines** | A countdown timeline; reminders 7, 5 and 2 days before and on the day |
+| **Evening review** | Mood, "how today felt", "mistakes", "a note to tomorrow" (autosaved), plus up to 3 photos |
+| **Notes** | Ideas with a status lifecycle (open → feasible / done / revised / dropped) and quick to-dos; either can be scheduled onto a day |
+| **Calendar** | Monday-first month grid, newest month on top; per-day task preview, mood and 📷 markers |
+| **Reminders** | Server push at 07:30 (today's tasks + deadlines) and 23:00 (unfinished tasks + review nudge), per-user time zone |
+| **Accounts** | Email sign-up, password reset, multi-device sync, self-service account deletion |
 
-```bash
-cd ~/Desktop/daily-app
-python3 -m http.server 5173
+## Architecture
+
+```mermaid
+flowchart LR
+    subgraph Client["PWA (vanilla ES modules, no build step)"]
+        UI["Views<br/>today · calendar · review · notes"] --> ST["Local store<br/>localStorage + dirty set"]
+        UI --> PH["Photo store<br/>IndexedDB blobs"]
+        ST <--> SY["Sync engine<br/>REST, no SDK"]
+        SW["Service Worker<br/>offline shell · push display"]
+    end
+
+    subgraph Supabase["Supabase (free tier)"]
+        AU[Auth]
+        DB[("Postgres<br/>items · push_subscriptions · push_log<br/>Row-Level Security")]
+        STG[("Storage<br/>private bucket review-photos")]
+        CR["pg_cron<br/>every minute"] --> EF["Edge Function<br/>send-reminders"]
+        EF --> DB
+    end
+
+    SY <-- "incremental pull / batched upsert" --> DB
+    SY --> AU
+    PH <-- "upload / download once" --> STG
+    EF -- "Web Push (RFC 8291 + VAPID)" --> PS["APNs / FCM / Mozilla push"]
+    PS --> SW
 ```
 
-浏览器打开 http://localhost:5173 。（不能直接双击 index.html，ES 模块需要通过服务器访问。）
+## Technical highlights
 
-## 2. 配置 Supabase 云同步（免费，约 10 分钟）
+### 1. Offline-first sync without an SDK
 
-1. 打开 https://supabase.com → 用 GitHub 或邮箱注册 → **New project**
-   - Region 选 **Singapore** 或 **Tokyo**（国内访问更快）
-   - 数据库密码随便设一个并记下
-2. 项目创建好后，左侧 **SQL Editor** → New query → 把 `supabase.sql` 的全部内容粘贴进去 → **Run**
-3. 左侧 **Authentication → Sign In / Providers → Email**，关掉 **Confirm email**（自用不需要邮箱验证，省得收邮件），保存
-4. 左侧 **Project Settings → API Keys**（或 Data API），复制：
-   - **Project URL**：`https://xxxx.supabase.co`
-   - **anon / publishable key**（公开密钥，可以放在前端；**不要**用 service_role / secret key）
-5. 打开 App → 右上角齿轮 → 填入地址和密钥 → 填邮箱和密码 → **注册新账号**
-6. 在其他设备上填同样的地址、密钥，用同一个邮箱密码 **登录**
+All user data lives in **one generic table** — `items(id, type, data jsonb, updated_at, deleted, server_updated_at)` — so new features (habits, notes, reviews, photos) never need a schema migration.
 
-同步时机：每次修改后约 1.5 秒、App 回到前台、恢复联网时、以及每 60 秒自动同步。断网时照常使用，联网后自动补传。
+- **Local first.** Every change is written to `localStorage` immediately and its id is added to a *dirty set*; the UI never waits for the network.
+- **Push.** Dirty rows are sent in batches of 200 with `upsert … on conflict (id)`; ids are client-generated UUIDs, so offline creation never collides.
+- **Incremental pull.** A Postgres trigger stamps every write with `server_updated_at = clock_timestamp()`. Clients pull only rows newer than their last cursor. The cursor uses *server* time on purpose — device clocks cannot be trusted to be monotonic across devices.
+- **Deletes are tombstones** (`deleted = true`) so that a deletion on one device reaches the others.
+- **Conflict resolution** is record-level last-write-wins on `updated_at`.
+- **Account switching** on a shared device: local data that belongs to another account is cleared instead of being uploaded into the new one.
+- Sync runs 1.5 s after a local change, on returning to the foreground, on reconnect and every 60 s.
 
-## 3. 部署上线（让 iPhone / iPad 能用）
+### 2. Scheduled Web Push, implemented from the RFCs
 
-PWA 需要 https 网址。最简单的免费方式：
+Reminders that rely on the page being open are unreliable on phones, so they are sent from the server.
 
-- **Netlify Drop**：打开 https://app.netlify.com/drop ，把整个 `daily-app` 文件夹拖进去，几秒后得到一个 `https://xxx.netlify.app` 网址（注册账号后可以长期保留、改名）
-- 以后改了代码，再拖一次即可更新
+- `pg_cron` calls the Edge Function every minute (authenticated with a shared `x-cron-secret`).
+- For each user the function computes the **local time in that user's time zone** (`Intl.DateTimeFormat`), decides whether a morning or night reminder is due, and builds the message from the same task rules as the client.
+- **Exactly once per day:** before sending, it inserts `(user_id, kind, day)` into `push_log`, whose primary key makes the insert a lock — `on conflict do nothing` means only the first invocation wins, even if two runs overlap.
+- **No push library:** payload encryption (**RFC 8291**, `aes128gcm`: ECDH P-256 → HKDF → AES-128-GCM) and server authentication (**RFC 8292 VAPID**, ES256-signed JWT) are written directly against WebCrypto, so the function runs on Deno with zero dependencies.
+- Expired subscriptions (HTTP 404/410 from the push service) are deleted automatically.
+- Without push permission the app falls back to in-page reminders, and it suppresses them when server push is on so the user never gets the same reminder twice.
 
-## 4. 安装到各设备
+### 3. Recurring tasks that keep their history
 
-- **iPhone / iPad**：用 Safari 打开网址 → 分享按钮 → **添加到主屏幕** → 从主屏幕图标打开 → 设置里点「开启通知」
-- **Mac**：Safari 菜单 **文件 → 添加到程序坞**；或 Chrome 地址栏右侧的「安装」图标
+A weekly habit is a *template* (`days`, `time`, `from`, `until`, `pauseFrom/To`). Its occurrence on a given date is computed, not stored; only deviations are stored as an override row with id `fx|<template>|<date>`.
 
-## 5. 关于提醒
+- An override stores **only the fields that differ** from the template, so later template edits still flow into the fields the user did not change.
+- Deleting a habit from one day's edit view writes `skipped: true` for that day only.
+- **Changing the schedule never rewrites history:** if the template already has past occurrences, it is split at the effective date — the old one gets `until = effective − 1`, a new one starts at `effective` — so completed past days keep their original title and status.
+- Rest days and pause windows suppress all habits without touching one-off tasks.
 
-- 每天 07:30：今天的任务清单；时间轴里截止前 7 天、5 天、2 天、当天的任务
-- 每天 23:00：今天还没完成的任务
-- 当前版本在 App 打开或刚切到后台时发通知（错过的时间点会在下次打开时补提醒）；App 完全关闭时也能准点收到的推送，需要 Supabase Edge Function + Web Push，可以下一步加
+### 4. Review photos within a 1 GB free quota
 
-## 文件说明
+- Photos are resized on the device to ≤ 1280 px and encoded as **WebP** (JPEG fallback where Safari cannot encode WebP), typically 100–200 KB.
+- They are stored first in **IndexedDB**, so they display offline, and uploaded in the background to a **private** bucket under `<user-id>/<photo-id>.<ext>`.
+- Each device downloads each photo **once** and then serves it locally, keeping egress far below the 5 GB/month free limit.
+- Deletions are queued and replayed when online; because storage objects are not cascaded when an account is deleted, the app removes all of a user's photos before deleting the account.
 
-| 文件 | 作用 |
+### 5. Security model
+
+- **Row-Level Security on every table**; an insert/update trigger overwrites `user_id` with `auth.uid()`, so a client cannot write into someone else's rows even by forging the field.
+- Privileged operations (`delete_my_account`, `save_push_subscription`) are `SECURITY DEFINER` functions with `EXECUTE` revoked from `public` / `anon`.
+- `push_log` has RLS enabled and no policies — only the server (service role) can read or write it.
+- Storage policies restrict every operation to the caller's own folder (`storage.foldername(name)[1] = auth.uid()`).
+- The browser only ever holds the publishable key; the service-role key and VAPID private key exist only as Edge Function secrets.
+- A Content-Security-Policy (`script-src 'self'`) blocks injected scripts; all user text is HTML-escaped before rendering.
+
+### 6. Zero dependencies, zero cost
+
+Native ES modules, no bundler, no `npm install`. Hosting is static (Netlify); backend, auth, storage, cron and functions run on Supabase's free tier. The trade-offs are listed under *Limitations*.
+
+## Tech stack
+
+| Layer | Technology |
 |---|---|
-| `index.html` / `styles.css` | 页面和样式（自动适配深色模式、iPad/Mac 左侧导航） |
-| `js/app.js` | 路由、批量编辑、点击事件 |
-| `js/views.js` | 今天 / 编辑一天 / 时间轴 / 日历 / 设置 页面 |
-| `js/store.js` | 本地数据（localStorage）、每日任务与截止任务 |
-| `js/sync.js` | Supabase 同步（REST 接口，最后修改者胜出） |
-| `js/notify.js` | 提醒通知 |
-| `sw.js` / `manifest.webmanifest` | PWA 离线缓存与安装信息 |
-| `supabase.sql` | 云端建表脚本（新项目用，已包含注销功能） |
-| `supabase-update.sql` | 已有项目的更新脚本（注销账户） |
-| `js/config.js` | 内置的 Supabase 地址和公开密钥 |
+| Client | HTML, CSS, vanilla JavaScript (ES modules), Service Worker, Web Push API, IndexedDB, Canvas |
+| Backend | Supabase: Postgres + Row-Level Security, Auth, Storage, Edge Functions (Deno, TypeScript), pg_cron, pg_net |
+| Hosting | Netlify (static) |
+| Tests | `node:test` (built into Node.js) |
 
-改了 js/css 后，记得把 `sw.js` 里的 `VERSION` 改一下（比如 v0.8.1），让各设备拿到新版本。
+## Project structure
+
+```
+├── index.html, styles.css, manifest.webmanifest, sw.js, _headers
+├── js/
+│   ├── app.js        routing, event delegation, modals
+│   ├── views.js      HTML rendering for every page
+│   ├── store.js      local data store + domain logic (habits, deadlines, reviews)
+│   ├── sync.js       auth + sync engine (Supabase REST, no SDK)
+│   ├── photos.js     photo compression, IndexedDB cache, Storage upload
+│   ├── push.js       push subscription management
+│   └── notify.js     in-app fallback reminders
+├── supabase/
+│   ├── schema.sql, delete-account.sql, push.sql, photos.sql
+│   ├── cron.example.sql
+│   └── functions/send-reminders/index.ts
+├── tests/store.test.js
+├── scripts/usage-stats.sql   anonymized usage counts (no content is read)
+└── docs/                     user guide and setup guides (Chinese)
+```
+
+## Getting started
+
+```bash
+# 1. Run locally (ES modules need an HTTP server)
+python3 -m http.server 5173        # open http://localhost:5173
+
+# 2. Tests
+npm test                           # Node.js 20+; no packages to install
+```
+
+To enable sync, create a free Supabase project, run `supabase/schema.sql`, `delete-account.sql`, `push.sql` and `photos.sql` in the SQL editor, and put the project URL and **publishable** key in `js/config.js`. Server push additionally needs the Edge Function, three secrets and the cron job — see [`docs/push-setup.zh-CN.md`](docs/push-setup.zh-CN.md).
+
+## Testing
+
+16 tests cover the logic that is easiest to get wrong: dirty tracking and tombstones, last-write-wins merging of remote rows, persistence, weekday/date-range expansion of habits, pause windows and rest days, per-day overrides that still follow later template edits, template splitting that preserves history, deadline reminder offsets, review emptiness rules and calendar visibility.
+
+## Real-world use
+
+I use Rishi for my own day-to-day planning across iPhone, iPad and Mac; friends can register their own independent accounts. `scripts/usage-stats.sql` produces anonymized per-user counts (active days, tasks, completion rate, reviews) without reading any content.
+
+<!-- TODO(shary): fill in with numbers from scripts/usage-stats.sql before submitting applications -->
+
+## Limitations & next steps
+
+- **Conflict resolution is coarse.** Last-write-wins compares *client* timestamps at *record* level: two devices editing the same day's review at the same time can overwrite each other, and a device with a wrong clock can win incorrectly. Next step: server-assigned versions or hybrid logical clocks, and field-level merge for reviews.
+- **`localStorage` is limited to about 5 MB.** Text data is far below that, but moving the main store to IndexedDB would remove the ceiling.
+- **UI is not covered by automated tests** — only the domain logic is. Playwright end-to-end tests for the main flows would be next.
+- **Free-tier constraints:** Supabase pauses a free project after a week of inactivity, and the JSON export does not include photos.

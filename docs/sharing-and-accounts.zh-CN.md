@@ -23,7 +23,7 @@ export const SUPABASE_KEY = 'sb_publishable_xxxxxxxx';
 
 ## 第 2 步：运行更新脚本，开启「注销账户」（1 分钟）
 
-Supabase 后台 → 左侧 **SQL Editor** → New query → 把文件夹里 `supabase-update.sql` 的全部内容粘贴进去 → **Run**，看到 Success 即可。
+Supabase 后台 → 左侧 **SQL Editor** → New query → 把 `supabase/delete-account.sql` 的全部内容粘贴进去 → **Run**，看到 Success 即可。
 
 ---
 

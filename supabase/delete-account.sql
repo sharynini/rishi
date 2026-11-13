@@ -1,5 +1,5 @@
 -- 日拾 · 云端更新脚本（注销账户功能）
--- 已经运行过 supabase.sql 的话，只需要再运行这一个文件：
+-- 已经运行过 supabase/schema.sql 的话，只需要再运行这一个文件：
 -- Supabase 控制台 → SQL Editor → New query → 粘贴全部内容 → Run
 
 -- 让已登录的用户删除「自己」的账号；items 表设置了 on delete cascade，账号删除后数据会一起删除

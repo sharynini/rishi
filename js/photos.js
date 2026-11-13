@@ -1,7 +1,7 @@
 // 复盘照片：手机上先压缩 → 存进本机 IndexedDB（离线也能看）→ 联网后上传到 Supabase Storage 的私密存储桶
 //
 // 云端路径：review-photos/<用户 ID>/<照片 ID>.<扩展名>
-//   - 存储桶是私密的，RLS 规则只允许本人读写自己 <用户 ID>/ 下的文件（见 photos.sql）
+//   - 存储桶是私密的，RLS 规则只允许本人读写自己 <用户 ID>/ 下的文件（见 supabase/photos.sql）
 //   - 复盘数据里只记 { id, ext }，路径由当前登录账号拼出来，换设备同样能找到
 // 免费额度：压缩后每张约 100–200 KB；每台设备每张只下载一次，之后从本机读取，几乎不耗流量
 import { sync } from './sync.js';
@@ -156,7 +156,7 @@ async function storageFetch(p, { method = 'GET', body, headers = {} } = {}) {
     let msg = `照片${method === 'GET' ? '下载' : '同步'}失败 (${res.status})`;
     try {
       const d = await res.json();
-      if (/bucket not found/i.test(d.message || d.error || '')) msg = '云端还没有照片存储：请管理员先运行 photos.sql';
+      if (/bucket not found/i.test(d.message || d.error || '')) msg = '云端还没有照片存储：请管理员先运行 supabase/photos.sql';
       else if (d.message) msg += '：' + d.message;
     } catch {}
     const err = new Error(msg);

@@ -10,19 +10,19 @@
 
 > 这个文件夹（日拾-云端推送）**不要**拖到 Netlify，里面有密钥。
 
-前提：已经按《分享与账号设置指南》填好了 `日拾/js/config.js` 里的项目地址和公开密钥。
+前提：已经按《分享与账号设置指南》（docs/sharing-and-accounts.zh-CN.md）填好了 `日拾/js/config.js` 里的项目地址和公开密钥。
 
 ---
 
 ## 第 1 步：建推送用的数据表（1 分钟）
 
-Supabase → **SQL Editor** → New query → 粘贴本文件夹里 `push.sql` 的全部内容 → **Run**。
+Supabase → **SQL Editor** → New query → 粘贴 `supabase/push.sql` 的全部内容 → **Run**。
 
 ## 第 2 步：部署推送函数（5 分钟）
 
 1. Supabase 左侧 **Edge Functions** → **Deploy a new function** → 选 **Via Editor**（在网页里编辑）
 2. 函数名填：`send-reminders`（必须一字不差）
-3. 把编辑器里的示例代码全部删掉，粘贴本文件夹里 `index.ts` 的全部内容
+3. 把编辑器里的示例代码全部删掉，粘贴 `supabase/functions/send-reminders/index.ts` 的全部内容
 4. 点 **Deploy function**
 5. 部署好后进入这个函数的 **Details / Settings**，把 **Verify JWT（Enforce JWT verification）** 关掉并保存
    - 原因：定时任务用的是我们自己的口令（CRON_SECRET）来验证，不是登录令牌
@@ -41,8 +41,8 @@ Supabase → **Edge Functions → Secrets**（有的版本在 Project Settings �
 
 ## 第 4 步：设置每分钟运行一次（2 分钟）
 
-1. 本文件夹里的 `cron.sql` 已经填好了你的项目地址，不用改
-2. Supabase → **SQL Editor** → 粘贴 `cron.sql` 的全部内容 → **Run**
+1. 复制 `supabase/cron.example.sql`，把 `<PROJECT_REF>` 和 `<CRON_SECRET>` 换成真实值（填好的版本不要提交到 git）
+2. Supabase → **SQL Editor** → 粘贴改好的全部内容 → **Run**
    - 如果报错说 `pg_cron` / `pg_net` 不能创建：先去 **Integrations → Cron** 点 Enable，**Integrations → pg_net**（或 Database → Extensions 里搜 pg_net）开启，再运行一次
 
 ## 第 5 步：更新网站

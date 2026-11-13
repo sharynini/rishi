@@ -50,13 +50,13 @@ function translate(msg) {
   if (/Email not confirmed/i.test(m)) return '邮箱还没验证：请去邮箱点确认链接，或在 Supabase 关闭「Confirm email」';
   if (/already registered/i.test(m)) return '这个邮箱已经注册过了，直接登录即可';
   if (/Password should be/i.test(m)) return '密码至少 6 位';
-  if (/relation .*items.* does not exist/i.test(m)) return '云端还没有 items 表：请先在 Supabase 运行 supabase.sql';
+  if (/relation .*items.* does not exist/i.test(m)) return '云端还没有 items 表：请先在 Supabase 运行 supabase/schema.sql';
   if (/Failed to fetch/i.test(m)) return '网络连接失败，请检查网络或项目地址';
   if (/Signups not allowed/i.test(m)) return '暂不开放注册，请联系 App 的管理员';
   if (/after \d+ seconds|rate limit/i.test(m)) return '操作太频繁了，请过一会儿再试';
   if (/same.*password|different from the old/i.test(m)) return '新密码不能和旧密码一样';
   if (/Error sending recovery email|sending.*email/i.test(m)) return '邮件发送失败：管理员还没在 Supabase 配置发信邮箱（SMTP）';
-  if (/delete_my_account/i.test(m)) return '云端还没有注销功能：请管理员先运行 supabase-update.sql';
+  if (/delete_my_account/i.test(m)) return '云端还没有注销功能：请管理员先运行 supabase/delete-account.sql';
   if (/User not found/i.test(m)) return '账号不存在';
   return m;
 }
