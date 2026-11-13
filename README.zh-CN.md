@@ -6,19 +6,17 @@
 
 ![Tests](https://img.shields.io/badge/node%3Atest-16%20passing-brightgreen) ![Dependencies](https://img.shields.io/badge/dependencies-0-blue) ![PWA](https://img.shields.io/badge/PWA-offline--first-e57a95) ![Supabase](https://img.shields.io/badge/backend-Supabase-3ecf8e) ![Cost](https://img.shields.io/badge/running%20cost-%240-lightgrey)
 
-<!-- TODO(shary): 截图 docs/screenshots/{day,calendar,review,timeline}.png
 <table>
   <tr>
-    <td><img src="docs/screenshots/day.png" width="200"/></td>
-    <td><img src="docs/screenshots/review.png" width="200"/></td>
-    <td><img src="docs/screenshots/calendar.png" width="200"/></td>
-    <td><img src="docs/screenshots/timeline.png" width="200"/></td>
+    <td><img src="docs/screenshots/day.jpg" width="200"/></td>
+    <td><img src="docs/screenshots/review.jpg" width="200"/></td>
+    <td><img src="docs/screenshots/calendar.jpg" width="200"/></td>
+    <td><img src="docs/screenshots/timeline.jpg" width="200"/></td>
   </tr>
   <tr>
     <td align="center">今天</td><td align="center">今日复盘</td><td align="center">日历</td><td align="center">截止时间轴</td>
   </tr>
 </table>
--->
 
 ---
 
